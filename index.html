@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Blood Donor Hub</title>
+  <style>
+    :root{
+      --red:#c62828;
+      --dark:#222;
+      --muted:#666;
+      --card:#fff;
+      --bg:#f6f6f6;
+      --maxw:1000px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;font-family:Inter, system-ui, Arial, sans-serif;
+      background:var(--bg);color:var(--dark);line-height:1.5;
+    }
+    .wrap{max-width:var(--maxw);margin:28px auto;padding:18px;}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:56px;height:56px;border-radius:8px;background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    nav a{margin-left:12px;color:var(--dark);text-decoration:none;font-weight:600}
+    .hero{background:#fff;padding:18px;border-radius:12px;margin-top:16px;display:flex;gap:20px;align-items:center}
+    .hero h1{margin:0;font-size:20px}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:18px}
+    .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(10,10,10,0.04)}
+    form .row{display:flex;gap:10px}
+    label{display:block;margin-bottom:6px;font-weight:600}
+    input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #ddd}
+    button{background:var(--red);color:#fff;border:0;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer}
+    .muted{color:var(--muted);font-size:13px}
+    .list{max-height:420px;overflow:auto}
+    .donor{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;border:1px solid #f0f0f0;margin-bottom:8px}
+    .small{font-size:13px;color:var(--muted)}
+    .searchbox{display:flex;gap:8px;margin-bottom:10px}
+    .center{text-align:center}
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+    @media(max-width:920px){.grid{grid-template-columns:1fr;}.hero{flex-direction:column;align-items:flex-start}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">BD</div>
+        <div>
+          <div style="font-weight:700">Blood Donor Hub</div>
+          <div class="muted">Helping connect donors & patients</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#register">Register</a>
+        <a href="#find">Find Donor</a>
+        <a href="#admin">Admin</a>
+      </nav>
+    </header>
+
+    <section class="hero card">
+      <div>
+        <h1>Join the life-saving community — Register as a donor</h1>
+        <p class="muted">Fill the form to add your details. You can later be searched by blood group and location.</p>
+      </div>
+      <div style="margin-left:auto">
+        <button onclick="scrollToEl('#register')">Register Now</button>
+      </div>
+    </section>
+
+    <div class="grid">
+      <!-- LEFT: Main content -->
+      <main>
+        <!-- Register -->
+        <section id="register" class="card" style="margin-bottom:16px">
+          <h3>Donate Blood — Registration Form</h3>
+          <p class="muted">Fill your details below. Choose where to store data: <strong>Firebase</strong> (recommended) or <strong>Google Forms</strong> (no-code).</p>
+
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <label class="muted" style="font-weight:600">Storage Mode:</label>
+            <select id="modeSelect">
+              <option value="firebase">Firebase (Firestore)</option>
+              <option value="googleform">Google Form (no-code)</option>
+            </select>
+          </div>
+
+          <!-- FORM -->
+          <form id="donorForm">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div>
+                <label for="name">Full name</label>
+                <input id="name" required />
+              </div>
+              <div>
+                <label for="phone">Phone</label>
+                <input id="phone" required />
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+              <div>
+                <label for="blood">Blood Group</label>
+                <select id="blood" required>
+                  <option value="">Select</option>
+                  <option>O+</option><option>O-</option>
+                  <option>A+</option><option>A-</option>
+                  <option>B+</option><option>B-</option>
+                  <option>AB+</option><option>AB-</option>
+                </select>
+              </div>
+              <div>
+                <label for="lastDate">Last Donation Date</label>
+                <input id="lastDate" type="date" />
+              </div>
+            </div>
+
+            <div style="margin-top:10px">
+              <label for="address">Address / City</label>
+              <input id="address" placeholder="City, Area, etc." />
+            </div>
+
+            <div style="margin-top:10px;display:flex;gap:10px;align-items:center">
+              <button type="submit">Submit</button>
+              <div id="formStatus" class="muted" style="margin-left:6px"></div>
+            </div>
+
+            <!-- Hidden: Google Form URL input -->
+            <div style="margin-top:12px">
+              <label class="muted">If using Google Form (paste public form URL here):</label>
+              <input id="gformUrl" placeholder="https://docs.google.com/forms/..." />
+              <div class="muted" style="font-size:12px;margin-top:6px">If Google Form used, the form will open in a new tab for users.</div>
+            </div>
+          </form>
+        </section>
+
+        <!-- Find Donor -->
+        <section id="find" class="card" style="margin-bottom:16px">
+          <h3>Find Donor</h3>
+          <div class="searchbox">
+            <input id="searchBlood" placeholder="Blood group (e.g., O+)" />
+            <input id="searchCity" placeholder="City or area (optional)" />
+            <button onclick="searchDonors()">Search</button>
+            <button onclick="loadAll()">Show All</button>
+          </div>
+          <div id="searchResults" class="list"></div>
+        </section>
+
+        <!-- Info -->
+        <section class="card">
+          <h3>How to use</h3>
+          <ol>
+            <li>To quickly collect donors, choose <strong>Google Form</strong> mode: create a public Google Form and paste its URL in the field above. Visitors will submit via Google Form.</li>
+            <li>To store and manage online (searchable) use <strong>Firebase</strong> mode: create Firebase project and paste config below.</li>
+            <li>Admin panel (below) shows all donors (requires Firebase).</li>
+          </ol>
+        </section>
+      </main>
+
+      <!-- RIGHT: Admin / preview -->
+      <aside>
+        <div class="card" id="admin" style="margin-bottom:12px">
+          <h3>Admin — Donor List</h3>
+          <p class="muted">(Firestore required to view here)</p>
+
+          <div style="margin-bottom:8px">
+            <label class="muted">Firebase Config (paste your project's config as JSON)</label>
+            <textarea id="firebaseConfig" style="width:100%;height:110px;padding:8px;border-radius:8px;border:1px solid #ddd" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}'></textarea>
+            <div class="muted" style="font-size:12px;margin-top:6px">After pasting, click "Init Firebase". (Only for you/admin)</div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button onclick="initFirebase()">Init Firebase</button>
+              <button onclick="clearLocalConfig()">Clear Config</button>
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <div style="margin-bottom:8px">
+              <label class="muted">Admin password (simple client-side)</label>
+              <input id="adminPass" placeholder="type admin password then click Unlock" />
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button onclick="unlockAdmin()">Unlock</button>
+                <button onclick="lockAdmin()">Lock</button>
+              </div>
+            </div>
+
+            <div id="adminPanel" style="display:none">
+              <div style="margin-bottom:8px">
+                <button onclick="downloadCSV()">Download CSV</button>
+                <button onclick="clearAllDonors()" style="background:#111;color:#fff">Clear ALL</button>
+              </div>
+              <div id="donorList" class="list"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card center">
+          <h4>Quick Links</h4>
+          <p class="muted">If you prefer no-code:</p>
+          <ol style="text-align:left;font-size:13px">
+            <li>Create a Google Form with same fields.</li>
+            <li>Paste form URL above in the Registration card.</li>
+            <li>Embed form in your website using &lt;iframe&gt; or link directly.</li>
+          </ol>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="wrap">
+      <div class="muted">Made with ♥ — Blood Donor Hub • You can host this file on GitHub Pages / Netlify.</div>
+    </footer>
+  </div>
+
+  <!-- Firebase SDKs will be loaded dynamically only if firebase config is provided -->
+  <script>
+    // Simple helpers & state
+    const modeSelect = document.getElementById('modeSelect');
+    const donorForm = document.getElementById('donorForm');
+    const formStatus = document.getElementById('formStatus');
+    const gformUrl = document.getElementById('gformUrl');
+    const searchResults = document.getElementById('searchResults');
+    const donorList = document.getElementById('donorList');
+    let firebaseApp = null;
+    let db = null;
+    let isAdmin = false;
+    // Admin password (client-side only) — change as you like
+    const ADMIN_PASSWORD = "admin123";
+
+    function scrollToEl(sel){document.querySelector(sel).scrollIntoView({behavior:'smooth'})}
+
+    donorForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      formStatus.textContent = "Submitting...";
+      const data = {
+        name: document.getElementById('name').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        blood: document.getElementById('blood').value,
+        lastDate: document.getElementById('lastDate').value || null,
+        address: document.getElementById('address').value.trim(),
+        createdAt: new Date().toISOString()
+      };
+
+      const mode = modeSelect.value;
+      if(mode === 'googleform'){
+        const url = gformUrl.value.trim();
+        if(!url){ formStatus.textContent = "Paste Google Form URL above."; return; }
+        // open google form in new tab for submit
+        window.open(url, '_blank');
+        formStatus.textContent = "Google Form opened in new tab.";
+        donorForm.reset();
+        return;
+      }
+
+      // Firebase mode
+      if(!db){
+        formStatus.textContent = "Firebase not initialized. Paste config & click Init.";
+        return;
+      }
+
+      try{
+        // add to firestore collection 'donors'
+        const docRef = await db.collection('donors').add(data);
+        formStatus.textContent = "Saved — thank you! (id: " + docRef.id + ")";
+        donorForm.reset();
+        // refresh list for admins
+        if(isAdmin) loadDonors();
+      }catch(err){
+        console.error(err);
+        formStatus.textContent = "Error: " + (err.message || err);
+      }
+    });
+
+    // Search donors by blood & city
+    async function searchDonors(){
+      searchResults.innerHTML = "<div class='muted'>Searching...</div>";
+      const blood = document.getElementById('searchBlood').value.trim().toUpperCase();
+      const city = document.getElementById('searchCity').value.trim().toLowerCase();
+      if(!db){
+        searchResults.innerHTML = "<div class='muted'>Enable Firebase and init to search (or use Google Sheet manually).</div>";
+        return;
+      }
+      try{
+        let q = db.collection('donors').orderBy('createdAt','desc').limit(500);
+        if(blood) q = q.where('blood','==', blood);
+        const snap = await q.get();
+        const items = [];
+        snap.forEach(d => {
+          const o = d.data(); o.id = d.id;
+          items.push(o);
+        });
+        let filtered = items;
+        if(city){
+          filtered = items.filter(it => (it.address||'').toLowerCase().includes(city));
+        }
+        if(filtered.length===0){
+          searchResults.innerHTML = "<div class='muted'>No donors found.</div>";
+          return;
+        }
+        searchResults.innerHTML = '';
+        filtered.forEach(d => {
+          const el = document.createElement('div');
+          el.className = 'donor';
+          el.innerHTML = "<div><div style='font-weight:700'>"+escapeHtml(d.name || '-')+"</div><div class='small'>"+escapeHtml(d.address || '-')+"</div></div><div style='text-align:right'><div style='font-weight:700'>"+escapeHtml(d.blood || '-')+"</div><div class='small'>"+escapeHtml(d.phone || '-')+"</div></div>";
+          searchResults.appendChild(el);
+        });
+      }catch(err){
+        console.error(err);
+        searchResults.innerHTML = "<div class='muted'>Search error: "+escapeHtml(err.message || err)+"</div>";
+      }
+    }
+
+    function loadAll(){
+      document.getElementById('searchBlood').value='';
+      document.getElementById('searchCity').value='';
+      searchDonors();
+    }
+
+    // Admin functions
+    function unlockAdmin(){
+      const pass = document.getElementById('adminPass').value;
+      if(pass === ADMIN_PASSWORD){
+        isAdmin = true;
+        document.getElementById('adminPanel').style.display = 'block';
+        loadDonors();
+      }else{
+        alert('Wrong password');
+      }
+    }
+    function lockAdmin(){
+      isAdmin = false;
+      document.getElementById('adminPanel').style.display = 'none';
+      donorList.innerHTML = '';
+    }
+
+    async function loadDonors(){
+      donorList.innerHTML = "<div class='muted'>Loading...</div>";
+      if(!db){ donorList.innerHTML = "<div class='muted'>Init Firebase first.</div>"; return; }
+      try{
+        const snap = await db.collection('donors').orderBy('createdAt','desc').limit(1000).get();
+        donorList.innerHTML = '';
+        snap.forEach(sd=>{
+          const d = sd.data(); d.id = sd.id;
+          const el = document.createElement('div');
+          el.className = 'donor';
+          el.innerHTML = "<div><div style='font-weight:700'>"+escapeHtml(d.name || '-')+"</div><div class='small'>"+escapeHtml(d.address || '-')+"</div><div class='small'>Last: "+escapeHtml(d.lastDate || '-')+"</div></div><div style='text-align:right'><div style='font-weight:700'>"+escapeHtml(d.blood || '-')+"</div><div class='small'>"+escapeHtml(d.phone || '-')+"</div><div style='margin-top:6px'><button onclick=\"deleteDonor('"+d.id+"')\" style='background:#eee;color:#111;padding:6px;border-radius:6px'>Delete</button></div></div>";
+          donorList.appendChild(el);
+        });
+      }catch(err){
+        console.error(err);
+        donorList.innerHTML = "<div class='muted'>Error loading donors: "+escapeHtml(err.message || err)+"</div>";
+      }
+    }
+
+    async function deleteDonor(id){
+      if(!confirm('Delete donor?')) return;
+      try{
+        await db.collection('donors').doc(id).delete();
+        loadDonors();
+      }catch(err){ alert('Delete error: '+err.message); }
+    }
+
+    async function clearAllDonors(){
+      if(!confirm('Clear all donors? This cannot be undone.')) return;
+      try{
+        // fetch ids then delete in batch
+        const snap = await db.collection('donors').get();
+        const batch = db.batch();
+        snap.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+        loadDonors();
+      }catch(err){ alert('Error clearing: '+err.message); }
+    }
+
+    async function downloadCSV(){
+      if(!db){ alert('Init Firebase first'); return; }
+      const snap = await db.collection('donors').orderBy('createdAt','desc').get();
+      const rows = [['Name','Phone','Blood','Address','LastDate','CreatedAt']];
+      snap.forEach(d=>{
+        const o = d.data();
+        rows.push([o.name||'',o.phone||'',o.blood||'',o.address||'',o.lastDate||'',o.createdAt||'']);
+      });
+      const csv = rows.map(r => r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'donors.csv'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    // Firebase init
+    async function initFirebase(){
+      const txt = document.getElementById('firebaseConfig').value.trim();
+      if(!txt){ alert('Paste firebase config JSON first'); return; }
+      let config = null;
+      try{ config = JSON.parse(txt); }catch(e){ alert('Invalid JSON'); return; }
+      // load SDKs if not loaded
+      if(window.firebase && window.firebase.apps && window.firebase.apps.length>0){
+        firebaseApp = window.firebase.app();
+        db = window.firebase.firestore();
+        alert('Firebase ready (already loaded).');
+        return;
+      }
+      // dynamic load
+      try{
+        await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+        await loadScript('https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js');
+        window.firebase.initializeApp(config);
+        firebaseApp = window.firebase.app();
+        db = window.firebase.firestore();
+        alert('Firebase initialized. You can now save & view donors.');
+      }catch(e){
+        console.error(e);
+        alert('Failed to load Firebase SDK: '+e.message);
+      }
+    }
+    function clearLocalConfig(){ document.getElementById('firebaseConfig').value=''; alert('Cleared'); }
+
+    // small util: dynamic script loader
+    function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s); }); }
+
+    function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
+  </script>
+
+  <!-- Extra notes for user (not executed) -->
+  <script type="application/json" id="instructions">
+  {
+    "firebase_steps": [
+      "Go to https://console.firebase.google.com and create a new project.",
+      "In Project Settings > General, register a web app and copy the firebaseConfig object (apiKey, authDomain, projectId, etc.). Paste that JSON into the 'Firebase Config' box above and click Init Firebase.",
+      "In Firestore Database, create a database in production or test mode. No special rules required for now (but for public use, set proper security rules).",
+      "Collection used: 'donors' (the code will create documents automatically)."
+    ],
+    "google_form_steps": [
+      "Open Google Forms and create a new form with fields: name, phone, blood, lastDate, address.",
+      "Make it public (anyone with link can respond).",
+      "Paste the form URL into the 'If using Google Form' field before submitting — the form will open in a new tab for the user to submit."
+    ],
+    "security_note": "This demo uses client-side Firebase keys. For production, secure your database with proper Firestore rules and consider using a backend to protect admin operations."
+  }
+  </script>
+</body>
+</html>
